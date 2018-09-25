@@ -32,7 +32,6 @@ import org.pentaho.di.core.parameters.UnknownParamException;
 import org.pentaho.di.job.Job;
 import org.pentaho.di.job.JobListener;
 import org.pentaho.di.job.JobMeta;
-import org.pentaho.di.trans.Trans;
 import org.pentaho.dictionary.DictionaryConst;
 import org.pentaho.metaverse.analyzer.kettle.extensionpoints.BaseRuntimeExtensionPoint;
 import org.pentaho.metaverse.api.AnalysisContext;
@@ -72,9 +71,9 @@ import java.util.concurrent.Future;
  * An extension point to gather runtime data for an execution of a job into an ExecutionProfile object
  */
 @ExtensionPoint(
-    description = "Job Runtime metadata extractor",
-    extensionPointId = "JobStart",
-    id = "jobRuntimeMetaverse" )
+  description = "Job Runtime metadata extractor",
+  extensionPointId = "JobStart",
+  id = "jobRuntimeMetaverse" )
 public class JobRuntimeExtensionPoint extends BaseRuntimeExtensionPoint implements JobListener {
 
   private IDocumentAnalyzer documentAnalyzer;
@@ -228,7 +227,7 @@ public class JobRuntimeExtensionPoint extends BaseRuntimeExtensionPoint implemen
 
       // Get the current execution profile for this job
       IExecutionProfile executionProfile =
-              JobLineageHolderMap.getInstance().getLineageHolder( job ).getExecutionProfile();
+        JobLineageHolderMap.getInstance().getLineageHolder( job ).getExecutionProfile();
       if ( executionProfile == null ) {
         // Something's wrong here, the transStarted method didn't properly store the execution profile. We should know
         // the same info, so populate a new ExecutionProfile using the current Trans
@@ -258,9 +257,8 @@ public class JobRuntimeExtensionPoint extends BaseRuntimeExtensionPoint implemen
         log.debug( Messages.getString( "ERROR.ErrorDuringAnalysisStackTrace" ), e );
       }
 
-      // Only create a lineage graph for this trans if it has no parent. If it does, the parent will incorporate the
-      // lineage information into its own graph
       try {
+<<<<<<< HEAD
         Job parentJob = job.getParentJob();
         Trans parentTrans = job.getParentTrans();
 
@@ -271,16 +269,26 @@ public class JobRuntimeExtensionPoint extends BaseRuntimeExtensionPoint implemen
           if ( lineageWriter != null && !"none".equals( lineageWriter.getOutputStrategy() ) ) {
             lineageWriter.outputLineageGraph( holder );
           }
+=======
+        // Add the execution profile information to the lineage graph
+        addRuntimeLineageInfo( holder );
+
+        if ( lineageWriter != null && !"none".equals( lineageWriter.getOutputStrategy() ) ) {
+          lineageWriter.outputLineageGraph( holder );
+          // lineage has been written - call the appropriate extension point
+          ExtensionPointHandler.callExtensionPoint(
+            job.getLogChannel(), MetaverseExtensionPoint.JobLineageWriteEnd.id, job );
+>>>>>>> b69dc4ea... [BACKLOG-25114] Adding sub-transformation / sub-job lineage support to IGC
         }
       } catch ( IOException e ) {
         log.warn( Messages.getString( "ERROR.CouldNotWriteLineageGraph", job.getName(),
-                Const.NVL( e.getLocalizedMessage(), "Unspecified" ) ) );
+          Const.NVL( e.getLocalizedMessage(), "Unspecified" ) ) );
         log.debug( Messages.getString( "ERROR.ErrorDuringAnalysisStackTrace" ), e );
       }
 
     } catch ( Throwable t ) {
       log.warn( Messages.getString( "ERROR.ErrorDuringAnalysis", job.getName(),
-              Const.NVL( t.getLocalizedMessage(), "Unspecified" ) ) );
+        Const.NVL( t.getLocalizedMessage(), "Unspecified" ) ) );
       log.debug( Messages.getString( "ERROR.ErrorDuringAnalysisStackTrace" ), t );
     }
   }
@@ -339,7 +347,7 @@ public class JobRuntimeExtensionPoint extends BaseRuntimeExtensionPoint implemen
       for ( String param : params ) {
         try {
           ParamInfo paramInfo = new ParamInfo( param, job.getParameterDescription( param ),
-              job.getParameterDefault( param ) );
+            job.getParameterDefault( param ) );
           paramList.add( paramInfo );
         } catch ( UnknownParamException e ) {
           e.printStackTrace();
