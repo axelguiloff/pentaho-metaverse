@@ -26,12 +26,16 @@ import org.apache.commons.lang.ObjectUtils;
 import org.pentaho.di.core.KettleClientEnvironment;
 import org.pentaho.di.core.extension.ExtensionPointInterface;
 import org.pentaho.di.version.BuildVersion;
+import org.pentaho.dictionary.DictionaryConst;
+import org.pentaho.metaverse.api.IDocumentAnalyzer;
 import org.pentaho.metaverse.api.ILineageWriter;
 import org.pentaho.metaverse.api.IMetaverseBuilder;
 import org.pentaho.metaverse.api.model.IExecutionEngine;
 import org.pentaho.metaverse.api.model.IExecutionProfile;
 import org.pentaho.metaverse.api.model.LineageHolder;
 import org.pentaho.metaverse.impl.model.ExecutionEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -44,6 +48,10 @@ public abstract class BaseRuntimeExtensionPoint implements ExtensionPointInterfa
   public static final String EXECUTION_ENGINE_DESCRIPTION =
     "Pentaho Data Integration (PDI) prepares and blends data to create a complete picture of your business "
       + "that drives actionable insights.";
+
+  private static final Logger log = LoggerFactory.getLogger( BaseRuntimeExtensionPoint.class );
+
+  private IDocumentAnalyzer documentAnalyzer;
 
   protected ILineageWriter lineageWriter;
 
@@ -71,9 +79,9 @@ public abstract class BaseRuntimeExtensionPoint implements ExtensionPointInterfa
 
   public static IExecutionEngine getExecutionEngineInfo() {
     IExecutionEngine executionEngine = new ExecutionEngine();
-    executionEngine.setName( EXECUTION_ENGINE_NAME );
+    executionEngine.setName( DictionaryConst.EXECUTION_ENGINE_NAME );
     executionEngine.setVersion( BuildVersion.getInstance().getVersion() );
-    executionEngine.setDescription( EXECUTION_ENGINE_DESCRIPTION );
+    executionEngine.setDescription( DictionaryConst.EXECUTION_ENGINE_DESCRIPTION );
     return executionEngine;
   }
 
